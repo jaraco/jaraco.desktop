@@ -141,27 +141,29 @@ def _set_wallpaper_win32(filename):
 set_wallpaper = globals()['_set_wallpaper_' + sys.platform]
 
 #------------------------------------------------------------------------------
-fs = free_space(picture_dir)
-if not fs:
-	print "%s does not exist, please create." % picture_dir
-	sys.exit(0)
-if fs <= free_space_minimum:
-	print "Not enough free space in %s! (%s%% free)" % (picture_dir, fs)
-	sys.exit(0)
+def set_random_wallpaper():
+	fs = free_space(picture_dir)
+	if not fs:
+		print "%s does not exist, please create." % picture_dir
+		sys.exit(0)
+	if fs <= free_space_minimum:
+		print "Not enough free space in %s! (%s%% free)" % (picture_dir, fs)
+		sys.exit(0)
 
-ut = get_wallpaper_details(base_url)
-url, title = ut[0], ut[1]
-if not url:
-	print "No wallpaper URL found."
-	sys.exit(0)
+	ut = get_wallpaper_details(base_url)
+	url, title = ut[0], ut[1]
+	if not url:
+		print "No wallpaper URL found."
+		sys.exit(0)
 
-# Verify pictures_dir exists
-if not os.path.isdir(picture_dir):
-	print "Hey! This no exist " + picture_dir
-	os.mkdir(picture_dir)
-	print "Created dir."
+	# Verify pictures_dir exists
+	if not os.path.isdir(picture_dir):
+		print "Hey! This no exist " + picture_dir
+		os.mkdir(picture_dir)
+		print "Created dir."
 
-filename = download_wallpaper(url, picture_dir, title)
-set_wallpaper(filename)
+	filename = download_wallpaper(url, picture_dir, title)
+	set_wallpaper(filename)
 
-sys.exit(0)
+if __name__ == '__main__':
+	set_random_wallpaper()
