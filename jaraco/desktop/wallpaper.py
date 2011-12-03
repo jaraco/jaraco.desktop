@@ -104,8 +104,8 @@ def get_wallpaper_details(base_url):
 		raise SystemExit(4)
 
 	# Find wallpaper image URL
-	match = last(soup.findAll("div", {"class": "download_link"}))
-	urls = [link['href'] for link in match.findAll('a')]
+	match = last(soup.findAll("div", {"class": "primary_photo"}))
+	urls = [img['src'] for img in match.findAll('img')]
 	if len(urls) != 1:
 		return False
 	url = urls[0]
