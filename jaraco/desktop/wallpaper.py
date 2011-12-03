@@ -12,7 +12,7 @@ The routine won't run if you are low on space, easily configurable below.
 Assumes Gnome or Windows.
 """
 
-from __future__ import division, print_function
+from __future__ import division, print_function, unicode_literals
 
 import os
 import re
@@ -93,9 +93,9 @@ def get_wallpaper_details(base_url):
 		return False
 	# Their pages write some script tags through document.write, which was
 	# causing BeautifulSoup to choke
-	html = ''.join(
+	html = b''.join(
 		line for line in html
-		if not 'document.write' in line
+		if not b'document.write' in line
 	)
 	try:
 		soup = BeautifulSoup(html)
