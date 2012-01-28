@@ -22,8 +22,8 @@ import ctypes
 import subprocess
 import collections
 
-from BeautifulSoup import BeautifulSoup, Tag
-from HTMLParser import HTMLParser, HTMLParseError
+from BeautifulSoup import BeautifulSoup
+from HTMLParser import HTMLParseError
 
 from .itertools import last
 from .string import local_format as lf
@@ -121,7 +121,6 @@ def download_wallpaper(url, picture_dir, filename):
 	Downloads URL passed, saves in specified location, cleans filename.
 	"""
 	filename = filename + "." + url.split(".")[-1]
-	image = urllib2.urlopen(url)
 	outpath = os.path.join(picture_dir, filename)
 	try:
 		f = urllib2.urlopen(url)
