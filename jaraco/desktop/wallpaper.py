@@ -12,7 +12,9 @@ The routine won't run if you are low on space, easily configurable below.
 Assumes Gnome or Windows.
 """
 
-from __future__ import division, print_function, unicode_literals
+from __future__ import (division, print_function, unicode_literals,
+	absolute_import,
+)
 
 import os
 import re
