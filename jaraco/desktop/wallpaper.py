@@ -19,13 +19,18 @@ from __future__ import (division, print_function, unicode_literals,
 import os
 import re
 import sys
-import urllib2
 import ctypes
 import subprocess
 import collections
 
-from BeautifulSoup import BeautifulSoup
-from HTMLParser import HTMLParseError
+try:
+	import urllib.request as urllib_request
+	import html.parser as html_parser
+except ImportError:
+	import urllib2 as urllib_request
+	import HTMLParser as html_parser
+
+from bs4 import BeautifulSoup
 
 from .itertools import last
 from .string import local_format as lf
@@ -89,8 +94,8 @@ def get_wallpaper_details(base_url):
 	>>> assert detail.title == detail.title.lower()
 	"""
 	try:
-		html = urllib2.urlopen(base_url)
-	except (urllib2.URLError, urllib2.HTTPError) as e:
+		html = urllib_request.urlopen(base_url)
+	except (urllib_request.URLError, urllib_request.HTTPError) as e:
 		# Their server isn't responding, or in time, or the page is unavailable
 		return False
 	# Their pages write some script tags through document.write, which was
@@ -101,7 +106,7 @@ def get_wallpaper_details(base_url):
 	)
 	try:
 		soup = BeautifulSoup(html)
-	except HTMLParseError as e:
+	except html_parser.HTMLParseError as e:
 		print(e)
 		raise SystemExit(4)
 
