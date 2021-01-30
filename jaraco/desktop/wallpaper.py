@@ -105,12 +105,12 @@ def get_wallpaper_details(base_url):
     """
     try:
         html = urllib_request.urlopen(base_url)
-    except (urllib_request.URLError, urllib_request.HTTPError) as e:
+    except (urllib_request.URLError, urllib_request.HTTPError):
         # Their server isn't responding, or in time, or the page is unavailable
         return False
     # Their pages write some script tags through document.write, which was
     # causing BeautifulSoup to choke
-    html = b''.join(line for line in html if not b'document.write' in line)
+    html = b''.join(line for line in html if b'document.write' not in line)
     try:
         soup = BeautifulSoup(html)
     except html_parser.HTMLParseError as e:
@@ -128,7 +128,7 @@ def get_wallpaper_details(base_url):
 
     # Get main title
     match = last(soup.findAll("h1"))
-    title = re.sub('[\W]+', '-', match.contents[0]).lower()
+    title = re.sub(r'[\W]+', '-', match.contents[0]).lower()
 
     return URLDetail(url, title)
 
