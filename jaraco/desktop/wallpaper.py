@@ -34,9 +34,8 @@ except ImportError:
     import HTMLParser as html_parser
 
 from bs4 import BeautifulSoup
+from more_itertools import last
 
-from .itertools import last
-from .string import local_format as lf
 
 picture_dir = os.path.expanduser("~/Pictures/NatGeoPics")
 # percentage of free space required on picture dir for the photo to be
@@ -55,7 +54,7 @@ def _get_free_bytes_win32(dir):
     total_bytes = ctypes.c_ulonglong()
     GetDiskFreeSpaceEx = ctypes.windll.kernel32.GetDiskFreeSpaceExW
     res = GetDiskFreeSpaceEx(
-        unicode(dir), None, ctypes.byref(total_bytes), ctypes.byref(free_bytes)
+        str(dir), None, ctypes.byref(total_bytes), ctypes.byref(free_bytes)
     )
     if not res:
         raise WindowsError("GetDiskFreeSpace failed")
@@ -119,7 +118,9 @@ def get_wallpaper_details(base_url):
         raise SystemExit(4)
 
     # Find wallpaper image URL
-    match = last(soup.findAll("div", {"class": "primary_photo"}))
+    match = last(soup.findAll("div", {"class": "primary_photo"}), None)
+    if not match:
+        return False
     urls = [img['src'] for img in match.findAll('img')]
     if len(urls) != 1:
         return False
@@ -139,14 +140,14 @@ def download_wallpaper(url, picture_dir, filename):
     filename = filename + "." + url.split(".")[-1]
     outpath = os.path.join(picture_dir, filename)
     try:
-        f = urllib2.urlopen(url)
-        print(lf("Downloading {url}"))
+        f = urllib_request.urlopen(url)
+        print(f"Downloading {url}")
         with open(outpath, "wb") as local_file:
             local_file.write(f.read())
-    except urllib2.HTTPError as e:
-        print(lf("HTTP Error: {e.code} {url}"))
-    except urllib2.URLError as e:
-        print(lf("URL Error: {e.reason} {url}"))
+    except urllib_request.HTTPError as e:
+        print(f"HTTP Error: {e.code} {url}")
+    except urllib_request.URLError as e:
+        print(f"URL Error: {e.reason} {url}")
 
     return outpath
 
@@ -174,21 +175,25 @@ def _set_wallpaper_win32(filename):
     SystemParametersInfo(
         SPI_SETDESKWALLPAPER,
         0,
-        unicode(filename),
+        str(filename),
         SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE,
     )
 
 
+def _set_wallpaper_darwin(filename):
+    raise NotImplementedError()
+
+
 set_wallpaper = globals()['_set_wallpaper_' + sys.platform]
 
-# ------------------------------------------------------------------------------
+
 def set_random_wallpaper():
     fs = free_space(picture_dir)
     if not fs:
-        print(lf("{picture_dir} does not exist, please create."))
+        print(f"{picture_dir} does not exist, please create.")
         raise SystemExit(1)
     if fs <= free_space_minimum:
-        print(lf("Not enough free space in {picture_dir}! ({fs}% free)"))
+        print(f"Not enough free space in {picture_dir}! ({fs}% free)")
         raise SystemExit(2)
 
     url, title = get_wallpaper_details(base_url)
