@@ -1,5 +1,5 @@
 """
-`jaraco.util.wallpaper`
+`jaraco.desktop.wallpaper`
 
 Based on nat-geo_background-setter.py by Samuel Huckins
 
@@ -12,25 +12,13 @@ The routine won't run if you are low on space, easily configurable below.
 Assumes Gnome or Windows.
 """
 
-from __future__ import (
-    division,
-    print_function,
-    unicode_literals,
-    absolute_import,
-)
-
 import os
 import sys
 import ctypes
 import subprocess
 import collections
-
-try:
-    import urllib.request as urllib_request
-    import html.parser as html_parser
-except ImportError:
-    import urllib2 as urllib_request  # type: ignore
-    import HTMLParser as html_parser  # type: ignore
+import urllib.request
+import html.parser
 
 from bs4 import BeautifulSoup
 
@@ -101,16 +89,16 @@ def get_wallpaper_details(base_url):
     >>> assert detail.url.startswith('http')
     """
     try:
-        html = urllib_request.urlopen(base_url)
-    except (urllib_request.URLError, urllib_request.HTTPError):
+        res = urllib.request.urlopen(base_url)
+    except (urllib.request.URLError, urllib.request.HTTPError):
         # Their server isn't responding, or in time, or the page is unavailable
         return False
     # Their pages write some script tags through document.write, which was
     # causing BeautifulSoup to choke
-    html = b''.join(line for line in html if b'document.write' not in line)
+    content = b''.join(line for line in res if b'document.write' not in line)
     try:
-        soup = BeautifulSoup(html)
-    except html_parser.HTMLParseError as e:
+        soup = BeautifulSoup(content)
+    except html.parser.HTMLParseError as e:
         print(e)
         raise SystemExit(4)
 
@@ -127,13 +115,13 @@ def download_wallpaper(url, picture_dir, filename):
     filename = filename + "." + url.split(".")[-1]
     outpath = os.path.join(picture_dir, filename)
     try:
-        f = urllib_request.urlopen(url)
+        f = urllib.request.urlopen(url)
         print(f"Downloading {url}")
         with open(outpath, "wb") as local_file:
             local_file.write(f.read())
-    except urllib_request.HTTPError as e:
+    except urllib.request.HTTPError as e:
         print(f"HTTP Error: {e.code} {url}")
-    except urllib_request.URLError as e:
+    except urllib.request.URLError as e:
         print(f"URL Error: {e.reason} {url}")
 
     return outpath
