@@ -139,7 +139,7 @@ def download_wallpaper(url, picture_dir, filename):
     return outpath
 
 
-def _set_wallpaper_linux2(filename):
+def _set_wallpaper_linux(filename):
     """
     Sets the passed file as wallpaper.
     """
