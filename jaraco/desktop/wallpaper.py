@@ -20,7 +20,6 @@ from __future__ import (
 )
 
 import os
-import re
 import sys
 import ctypes
 import subprocess
@@ -34,7 +33,6 @@ except ImportError:
     import HTMLParser as html_parser  # type: ignore
 
 from bs4 import BeautifulSoup
-from more_itertools import last
 
 
 picture_dir = os.path.expanduser("~/Pictures/NatGeoPics")
@@ -101,7 +99,6 @@ def get_wallpaper_details(base_url):
 
     >>> detail = get_wallpaper_details(base_url)
     >>> assert detail.url.startswith('http')
-    >>> assert detail.title == detail.title.lower()
     """
     try:
         html = urllib_request.urlopen(base_url)
@@ -118,18 +115,8 @@ def get_wallpaper_details(base_url):
         raise SystemExit(4)
 
     # Find wallpaper image URL
-    match = last(soup.findAll("div", {"class": "primary_photo"}), None)
-    if not match:
-        return False
-    urls = [img['src'] for img in match.findAll('img')]
-    if len(urls) != 1:
-        return False
-    url = urls[0]
-
-    # Get main title
-    match = last(soup.findAll("h1"))
-    title = re.sub(r'[\W]+', '-', match.contents[0]).lower()
-
+    url = soup.find("meta", {"name": "twitter:image:src"})['content']
+    title = soup.find("meta", {"name": "twitter:title"})['content']
     return URLDetail(url, title)
 
 
