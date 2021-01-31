@@ -30,8 +30,8 @@ try:
     import urllib.request as urllib_request
     import html.parser as html_parser
 except ImportError:
-    import urllib2 as urllib_request
-    import HTMLParser as html_parser
+    import urllib2 as urllib_request  # type: ignore
+    import HTMLParser as html_parser  # type: ignore
 
 from bs4 import BeautifulSoup
 from more_itertools import last
