@@ -97,7 +97,7 @@ def get_wallpaper_details(base_url):
     # causing BeautifulSoup to choke
     content = b''.join(line for line in res if b'document.write' not in line)
     try:
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content, 'html.parser')
     except html.parser.HTMLParseError as e:
         print(e)
         raise SystemExit(4)
