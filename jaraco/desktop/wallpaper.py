@@ -156,7 +156,14 @@ def _set_wallpaper_win32(filename):
 
 
 def _set_wallpaper_darwin(filename):
-    raise NotImplementedError()
+    cmd = [
+        'defaults',
+        'write',
+        'com.apple.desktop',
+        'Background',
+        f'{{default = {{ImageFilePath = "{filename}"; }};}}',
+    ]
+    subprocess.check_call(cmd)
 
 
 set_wallpaper = globals()['_set_wallpaper_' + sys.platform]
