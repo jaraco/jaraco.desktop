@@ -12,17 +12,16 @@ The routine won't run if you are low on space, easily configurable below.
 Assumes Gnome or Windows.
 """
 
-import os
-import sys
 import ctypes
+import html.parser
+import os
 import shutil
 import subprocess
-import collections
+import sys
 import urllib.request
-import html.parser
+from typing import NamedTuple
 
 from bs4 import BeautifulSoup
-
 
 picture_dir = os.path.expanduser("~/Pictures/NatGeoPics")
 # percentage of free space required on picture dir for the photo to be
@@ -47,10 +46,12 @@ def free_space(dir):
     except OSError:
         return False
     percen_free = usage.free / usage.total * 100
-    return int(round(percen_free))
+    return round(percen_free)
 
 
-URLDetail = collections.namedtuple('URLDetail', 'url title')
+class URLDetail(NamedTuple):
+    url: str
+    title: str
 
 
 def get_wallpaper_details(base_url):
