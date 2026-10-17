@@ -15,6 +15,7 @@ Assumes Gnome or Windows.
 import os
 import sys
 import ctypes
+import shutil
 import subprocess
 import collections
 import urllib.request
@@ -32,47 +33,20 @@ base_url = "http://photography.nationalgeographic.com/photography/photo-of-the-d
 # ------------------------------------------------------------------------------
 
 
-def _get_free_bytes_win32(dir):
-    """
-    Return folder/drive free space and total space (in bytes)
-    """
-    free_bytes = ctypes.c_ulonglong()
-    total_bytes = ctypes.c_ulonglong()
-    GetDiskFreeSpaceEx = ctypes.windll.kernel32.GetDiskFreeSpaceExW
-    res = GetDiskFreeSpaceEx(
-        str(dir), None, ctypes.byref(total_bytes), ctypes.byref(free_bytes)
-    )
-    if not res:
-        raise WindowsError("GetDiskFreeSpace failed")
-    free_bytes = free_bytes.value
-    total_bytes = total_bytes.value
-    return free_bytes, total_bytes
-
-
-def _get_free_bytes_default(dir):
-    """
-    Return folder/drive free space and total space (in bytes)
-    """
-    stat = os.statvfs(dir)
-    free_bytes = stat.f_bsize * stat.f_bfree
-    total_bytes = stat.f_bsize * stat.f_blocks
-    return free_bytes, total_bytes
-
-
-_get_free_bytes = globals().get(
-    '_get_free_bytes_' + sys.platform, _get_free_bytes_default
-)
-
-
 def free_space(dir):
     """
     Returns percentage of free space.
+
+    >>> 0 <= free_space('.') <= 100
+    True
+    >>> free_space('/does/not/exist')
+    False
     """
     try:
-        free, total = _get_free_bytes(dir)
+        usage = shutil.disk_usage(dir)
     except OSError:
         return False
-    percen_free = free / total * 100
+    percen_free = usage.free / usage.total * 100
     return int(round(percen_free))
 
 
